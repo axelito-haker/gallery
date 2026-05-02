@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galería de Recuerdos - Vanesita</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark-green: #0A3323;
+    --moss-green: #839958;
+    --beige: #F7F4D5;
+    --rosy: #D3968C;
+    --midnight: #105666;
+    --glass: rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.18);
+    --gold: #c9a85d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    background: #0d1a0f;
+    color: var(--beige);
+  }
+
+  /* ── FONDO ── */
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image: url("img/fondo.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: brightness(0.35) saturate(1.2);
+  }
+  .bg-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      180deg,
+      rgba(10,51,35,0.5) 0%,
+      transparent 40%,
+      rgba(10,51,35,0.7) 100%
+    );
+    pointer-events: none;
+  }
+
+  /* ── NAV CRISTAL ── */
+  nav {
+    position: fixed;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(4px) saturate(2);
+    -webkit-backdrop-filter: blur(24px) saturate(2);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 60px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    box-shadow:
+      0 8px 32px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.15);
+    max-width: 95vw;
+  }
+  nav a {
+    color: var(--beige);
+    text-decoration: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.95rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    padding: 7px 16px;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+  }
+  nav a:hover, nav a.active {
+    background: rgba(211,150,140,0.25);
+    color: #fff;
+  }
+  nav .sep {
+    width: 1px; height: 16px;
+    background: rgba(255,255,255,0.18);
+  }
+
+  /* ── MAIN ── */
+  main {
+    position: relative;
+    z-index: 10;
+    padding: 140px 20px 80px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    margin-bottom: 70px;
+    animation: heroIn 1.4s ease-out both;
+  }
+  @keyframes heroIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-label {
+    font-family: 'Dancing Script', cursive;
+    color: var(--rosy);
+    font-size: 1.4rem;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 7vw, 5rem);
+    font-weight: 400;
+    color: var(--beige);
+  }
+  .hero h1 em { color: var(--rosy); font-style: italic; }
+  .hero p {
+    font-style: italic;
+    opacity: 0.7;
+    margin-top: 10px;
+    font-size: 1.1rem;
+  }
+  .hero-line {
+    width: 100px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rosy), transparent);
+    margin: 20px auto 0;
+  }
+
+  /* ── GALERÍA ── */
+  /* Los marcos se adaptan al tamaño natural de la foto */
+  .frame-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .frame {
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), z-index 0s;
+    position: relative;
+    /* cada frame tiene su propia rotación definida inline */
+  }
+  .frame:hover {
+    transform: scale(1.06) rotate(0deg) !important;
+    z-index: 20;
+  }
+
+  .frame-border {
+    border: 8px solid var(--gold);
+    box-shadow:
+      0 0 0 1px rgba(201,168,93,0.25),
+      0 20px 50px rgba(0,0,0,0.7),
+      inset 0 0 0 2px rgba(201,168,93,0.1);
+    background: #111;
+    padding: 5px;
+    position: relative;
+  }
+  .frame-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,93,0.12) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* La foto ocupa todo — el marco se adapta a ella */
+  .frame-img {
+    display: block;
+    /* ancho máximo para que no sean enormes, pero se adapta */
+    max-width: 280px;
+    width: 100%;
+    height: auto;        /* ← mantiene proporción original */
+    object-fit: contain; /* ← NO recorta nada */
+  }
+
+  /* Overlay de texto al hover */
+  .frame-overlay {
+    position: absolute;
+    bottom: 5px; left: 5px; right: 5px;
+    background: linear-gradient(to top, rgba(0,0,0,0.88), transparent);
+    padding: 28px 14px 12px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 2;
+  }
+  .frame:hover .frame-overlay { opacity: 1; }
+  .frame-overlay p {
+    font-family: 'Dancing Script', cursive;
+    color: var(--beige);
+    font-size: 0.95rem;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+
+  /* Placeholder cuando no hay foto */
+  .frame-placeholder {
+    width: 220px;
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0A3323, #105666);
+  }
+  .frame-placeholder .icon { font-size: 2.5rem; opacity: 0.4; margin-bottom: 10px; }
+  .frame-placeholder p {
+    font-family: 'Dancing Script', cursive;
+    color: rgba(247,244,213,0.45);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 0 16px;
+  }
+
+  /* ── SECCIÓN LINKS estilo LinkBouquet ── */
+  .links-section {
+    margin-top: 100px;
+    text-align: center;
+  }
+  .links-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--beige);
+    margin-bottom: 10px;
+  }
+  .links-sub {
+    font-family: 'Dancing Script', cursive;
+    color: var(--rosy);
+    font-size: 1rem;
+    margin-bottom: 40px;
+    opacity: 0.8;
+  }
+
+  /* Input de URL */
+  .lb-input-row {
+    display: flex;
+    gap: 10px;
+    max-width: 680px;
+    margin: 0 auto 36px;
+  }
+  .lb-url-input {
+    flex: 1;
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 50px;
+    padding: 13px 22px;
+    color: var(--beige);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .lb-url-input::placeholder { color: rgba(247,244,213,0.3); }
+  .lb-url-input:focus { border-color: rgba(201,168,93,0.5); }
+  .lb-add-btn {
+    background: linear-gradient(135deg, var(--gold), var(--rosy));
+    border: none;
+    border-radius: 50px;
+    padding: 13px 28px;
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .lb-add-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .lb-add-btn:active { transform: scale(0.97); }
+
+  /* Lista de tarjetas */
+  .lb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* Tarjeta LinkBouquet con glass */
+  .lb-card {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(24px) saturate(1.8);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s;
+    position: relative;
+    box-shadow:
+      0 8px 32px rgba(0,0,0,0.3),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .lb-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.22);
+  }
+  /* Barra de color de plataforma */
+  .lb-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--pcolor, var(--gold));
+    border-radius: 4px 0 0 4px;
+  }
+
+  .lb-card-body {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px 16px 22px;
+  }
+
+  /* Ícono plataforma */
+  .lb-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: var(--pbg, rgba(201,168,93,0.12));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .lb-info { flex: 1; min-width: 0; text-align: left; }
+  .lb-platform-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--pcolor, var(--gold));
+    margin-bottom: 3px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .lb-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--beige);
+    font-family: 'Cormorant Garamond', serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lb-url-display {
+    font-size: 0.75rem;
+    color: rgba(247,244,213,0.4);
+    font-family: 'Cormorant Garamond', serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  .lb-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .lb-open-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 50px;
+    padding: 8px 18px;
+    color: var(--beige);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.88rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .lb-open-btn:hover {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.28);
+    color: #fff;
+  }
+  .lb-del-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(247,244,213,0.3);
+    font-size: 15px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: color 0.2s, background 0.2s;
+    line-height: 1;
+  }
+  .lb-del-btn:hover { color: #e07070; background: rgba(224,112,112,0.1); }
+
+  /* Embed / reproductor */
+  .lb-embed {
+    width: 100%;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .lb-embed iframe {
+    width: 100%; border: none; display: block;
+  }
+  .lb-embed.ratio-music iframe { height: 152px; }
+  .lb-embed.ratio-video { aspect-ratio: 16/9; }
+  .lb-embed.ratio-video iframe { height: 100%; }
+  .lb-embed.ratio-post iframe { height: 340px; }
+
+  /* Portada imagen para plataformas sin embed */
+  .lb-cover {
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 22px;
+    background: rgba(0,0,0,0.2);
+  }
+  .lb-cover-thumb {
+    width: 56px; height: 56px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.05);
+  }
+  .lb-cover-info { text-align: left; }
+  .lb-cover-label {
+    font-size: 0.75rem;
+    color: rgba(247,244,213,0.4);
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  /* Estado vacío */
+  .lb-empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: rgba(247,244,213,0.35);
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.1rem;
+  }
+
+  /* Toast */
+  .lb-toast {
+    position: fixed;
+    bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: rgba(10,51,35,0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(201,168,93,0.3);
+    border-radius: 50px;
+    padding: 10px 24px;
+    font-size: 0.88rem;
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--beige);
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .lb-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Modal agregar link */
+  .add-modal-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(12px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .add-modal-bg.open { display: flex; }
+  .add-modal {
+    background: linear-gradient(135deg, rgba(10,51,35,0.97), rgba(16,86,102,0.92));
+    border: 1px solid rgba(201,168,93,0.35);
+    border-radius: 24px;
+    padding: 40px;
+    width: 90%;
+    max-width: 440px;
+    text-align: center;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  }
+  .add-modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--gold);
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+  }
+  .add-modal input {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 50px;
+    padding: 12px 20px;
+    color: var(--beige);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    outline: none;
+    margin-bottom: 12px;
+    backdrop-filter: blur(10px);
+    transition: border-color 0.3s;
+  }
+  .add-modal input::placeholder { color: rgba(247,244,213,0.35); }
+  .add-modal input:focus { border-color: rgba(201,168,93,0.5); }
+  .modal-actions { display: flex; gap: 12px; margin-top: 8px; }
+  .btn-save {
+    flex: 1;
+    background: linear-gradient(135deg, rgba(201,168,93,0.35), rgba(211,150,140,0.3));
+    border: 1px solid rgba(201,168,93,0.4);
+    border-radius: 50px;
+    padding: 10px;
+    color: var(--beige);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-save:hover { background: rgba(201,168,93,0.5); }
+  .btn-cancel {
+    flex: 1;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    padding: 10px;
+    color: rgba(247,244,213,0.5);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-cancel:hover { border-color: rgba(255,255,255,0.3); color: var(--beige); }
+
+  /* ── MODAL RECUERDO ── */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: linear-gradient(135deg, rgba(10,51,35,0.95), rgba(16,86,102,0.9));
+    border: 1px solid rgba(201,168,93,0.35);
+    padding: 44px;
+    border-radius: 24px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  }
+  .modal h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--gold);
+    margin-bottom: 14px;
+    font-size: 1.6rem;
+  }
+  .modal p { line-height: 1.7; opacity: 0.88; font-size: 1.05rem; }
+  .modal button {
+    margin-top: 28px;
+    background: none;
+    border: 1px solid var(--rosy);
+    color: var(--rosy);
+    padding: 9px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+  .modal button:hover { background: rgba(211,150,140,0.2); }
+
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 50px 20px;
+    opacity: 0.4;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    font-family: 'Dancing Script', cursive;
+  }
+
+  /* ── CUADRO AGREGAR FOTO ── */
+  .add-frame { cursor: pointer; }
+  .add-frame-border {
+    border: 3px dashed rgba(201,168,93,0.45);
+    background: rgba(201,168,93,0.04);
+    padding: 5px;
+    box-shadow: none;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .add-frame:hover .add-frame-border {
+    border-color: rgba(201,168,93,0.8);
+    background: rgba(201,168,93,0.08);
+  }
+  .add-frame-inner {
+    width: 220px;
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .add-plus {
+    font-size: 3rem;
+    color: rgba(201,168,93,0.55);
+    line-height: 1;
+    transition: color 0.3s, transform 0.3s;
+    font-weight: 300;
+  }
+  .add-frame:hover .add-plus {
+    color: var(--gold);
+    transform: scale(1.15);
+  }
+  .add-label {
+    font-family: 'Dancing Script', cursive;
+    color: rgba(201,168,93,0.5);
+    font-size: 1rem;
+    transition: color 0.3s;
+  }
+  .add-frame:hover .add-label { color: var(--gold); }
+
+  #extraFrames {
+    display: contents;
+  }
+    nav { width: 92%; padding: 8px 12px; gap: 2px; font-size: 0.8rem; }
+    nav a { padding: 6px 10px; font-size: 0.8rem; }
+    nav .sep { display: none; }
+    .frame-img { max-width: 160px; }
+    .frame-placeholder { width: 160px; height: 200px; }
+  
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="bg-overlay"></div>
+
+<nav>
+  <a href="#" class="active">Inicio</a>
+  <div class="sep"></div>
+  <a href="#galeria">Galería</a>
+  <div class="sep"></div>
+  <a href="#links">Links</a>
+  <div class="sep"></div>
+  <a href="#frases">Frases</a>
+  <div class="sep"></div>
+  <a href="index.html">Juego</a>
+</nav>
+
+<main>
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <span class="hero-label">✦ para vanesita ✦</span>
+    <h1>Galería de <em>Recuerdos</em></h1>
+    <p>donde el tiempo se detiene para reordar cada momento juntos</p>
+    <div class="hero-line"></div>
+  </header>
+
+  <!-- ── GALERÍA ── -->
+  <section id="galeria">
+    <div class="frame-grid">
+
+      <!-- ★ FOTO 1 — cambia "img/foto1.jpg" por tu archivo ★ -->
+      <div class="frame" style="transform: rotate(-1.5deg);" onclick="openModal(0)">
+        <div class="frame-border">
+          <img src="img/WhatsApp Image 2026-05-02 at 4.40.58 PM.jpeg"
+               alt="Recuerdo 1" class="frame-img"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="frame-placeholder" style="display:none;">
+            <div class="icon">📷</div><p>foto1.jpg</p>
+          </div>
+          <div class="frame-overlay"><p>El inicio ✦</p></div>
+        </div>
+      </div>
+
+      <!-- ★ FOTO 2 ★ -->
+      <div class="frame" style="transform: rotate(1deg);" onclick="openModal(1)">
+        <div class="frame-border">
+          <img src="img/WhatsApp Image 2026-05-01 at 7.56.24 PM (2).jpeg"
+               alt="Recuerdo 2" class="frame-img"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="frame-placeholder" style="display:none;">
+            <div class="icon">📷</div><p>foto2.jpg</p>
+          </div>
+          <div class="frame-overlay"><p>Risas ✦</p></div>
+        </div>
+      </div>
+
+      <!-- ★ FOTO 3 ★ -->
+      <div class="frame" style="transform: rotate(-0.5deg);" onclick="openModal(2)">
+        <div class="frame-border">
+          <img src="img/WhatsApp Image 2026-05-01 at 7.56.24 PM (1).jpeg"
+               alt="Recuerdo 3" class="frame-img"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="frame-placeholder" style="display:none;">
+            <div class="icon">📷</div><p>foto3.jpg</p>
+          </div>
+          <div class="frame-overlay"><p>Destellos ✦</p></div>
+        </div>
+      </div>
+
+
+      <!-- ★ FOTOS AGREGADAS DINÁMICAMENTE ★ -->
+      <div id="extraFrames"></div>
+
+      <!-- ★ CUADRO + AGREGAR FOTO ★ -->
+      <div class="frame add-frame" style="transform: rotate(0deg);" onclick="document.getElementById('photoUpload').click()">
+        <div class="frame-border add-frame-border">
+          <div class="add-frame-inner">
+            <div class="add-plus">＋</div>
+            <p class="add-label">Agregar foto</p>
+          </div>
+        </div>
+      </div>
+      <input type="file" id="photoUpload" accept="image/*" style="display:none;" onchange="addPhoto(event)">
+
+    </div>
+  </section>
+
+  <!-- ── SECCIÓN LINKS estilo LinkBouquet ── -->
+  <section class="links-section" id="links">
+    <h2 class="links-title">Nuestros <em style="color:var(--rosy);">Links</em></h2>
+    <p class="links-sub">✦ música, recuerdos y todo lo que compartimos ✦</p>
+
+    <div class="lb-input-row">
+      <input type="url" class="lb-url-input" id="lbInput"
+             placeholder="Pega un link… YouTube, Spotify, Instagram…"
+             onkeydown="if(event.key==='Enter') lbAdd()">
+      <button class="lb-add-btn" onclick="lbAdd()">＋ Agregar</button>
+    </div>
+
+    <div class="lb-list" id="lbList"></div>
+  </section>
+
+  <!-- ── FRASES ── -->
+  <section id="frases" style="max-width:700px; margin:100px auto 0; text-align:center;">
+    <div style="
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 50px 40px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      position: relative;
+    ">
+      <span style="
+        position:absolute; top:-10px; left:24px;
+        font-family:'Playfair Display',serif;
+        font-size:8rem; color:var(--rosy); opacity:0.08;
+        line-height:1; pointer-events:none;
+      ">"</span>
+      <p id="quoteText" style="
+        font-family:'Playfair Display',serif;
+        font-style:italic;
+        font-size:1.2rem;
+        color:var(--beige);
+        line-height:1.8;
+        position:relative;
+        z-index:1;
+      ">"Hay recuerdos que no pesan… pero tampoco se van. Solo viven ahí, calladitos."</p>
+      <p id="quoteAuthor" style="
+        font-family:'Dancing Script',cursive;
+        color:var(--rosy);
+        margin-top:18px;
+        font-size:1rem;
+      ">— para vanesita</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>HECHO CON AMOR AXELITO ✦ 2026</footer>
+
+<!-- Modal recuerdo -->
+<div class="modal-bg" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalText"></p>
+    <button onclick="closeModalDirect()">Cerrar</button>
+  </div>
+</div>
+
+<!-- Modal agregar link (fallback nombre manual) -->
+<div class="add-modal-bg" id="addModal" onclick="closeAddModal(event)">
+  <div class="add-modal">
+    <h3>Agregar Link ✦</h3>
+    <input type="text" id="lbLabelInput" placeholder="Nombre personalizado (opcional)">
+    <div class="modal-actions">
+      <button class="btn-save"   onclick="lbSaveCustom()">Guardar</button>
+      <button class="btn-cancel" onclick="closeAddModalDirect()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="lb-toast" id="lbToast"></div>
+
+<script>
+  /* ── Frases rotativas ── */
+  const quotes = [
+    { text: "Te quiero así como eres. Con todo lo bueno que no ves, con todo lo malo que dices tener.", author: "— Mario Benedetti" },
+    { text: "De nadie seré, solo de ti, hasta que mis huesos se vuelvan ceniza y mi corazón deje de latir.", author: "—  Pablo Neruda" },
+    { text: "La mitad de tu belleza proviene de tu forma de hablar y tratar a las personas.", author: "— con amor" },
+    { text: "Más preciosa es que las piedras preciosas; y todo lo que puedes desear, no se puede comparar a ella.", author: "-Proverbios 3:15" }
+  ];
+  let qIdx = 0;
+  setInterval(() => {
+    qIdx = (qIdx + 1) % quotes.length;
+    document.getElementById('quoteText').textContent   = `"${quotes[qIdx].text}"`;
+    document.getElementById('quoteAuthor').textContent = quotes[qIdx].author;
+  }, 8500);
+
+  /* ── Modal recuerdos ── */
+  const info = [
+    { title: "El inicio",         text: "Ese momento donde todo cambió sin avisar. Una mirada, una palabra, y el mundo empezó a verse distinto." },
+    { title: "Risas compartidas", text: "Porque la felicidad hace ruido, pero tus risas son las que se quedaron grabadas en esta galería." },
+    { title: "Lo más especial",   text: "Si tuviera que elegir un solo cuadro de esta vida, sería cualquiera donde estés tú." },
+    { title: "Recuerdo 4",  text: "Edita este texto en el array 'info[3]' del script." },
+    { title: "Recuerdo 5",  text: "Edita este texto en el array 'info[4]' del script." },
+    { title: "Recuerdo 6",  text: "Edita este texto en el array 'info[5]' del script." },
+    { title: "Recuerdo 7",  text: "Edita este texto en el array 'info[6]' del script." },
+    { title: "Recuerdo 8",  text: "Edita este texto en el array 'info[7]' del script." },
+    { title: "Recuerdo 9",  text: "Edita este texto en el array 'info[8]' del script." },
+    { title: "Recuerdo 10", text: "Edita este texto en el array 'info[9]' del script." },
+  ];
+  function openModal(i) {
+    document.getElementById('modalTitle').textContent = info[i].title;
+    document.getElementById('modalText').textContent  = info[i].text;
+    document.getElementById('modal').classList.add('open');
+  }
+  function closeModal(e) { if (e.target.id === 'modal') closeModalDirect(); }
+  function closeModalDirect() { document.getElementById('modal').classList.remove('open'); }
+
+  /* ══════════════════════════════════════
+     LINKBOUQUET ENGINE
+  ══════════════════════════════════════ */
+  const PLAT = {
+    youtube: {
+      name: 'YouTube', color: '#FF4444', bg: 'rgba(255,68,68,0.15)', icon: '▶',
+      match: u => /youtube\.com|youtu\.be/.test(u),
+      embed: u => {
+        const m = u.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        return m ? { src: `https://www.youtube.com/embed/${m[1]}`, type: 'video' } : null;
+      },
+      title: () => 'Video de YouTube'
+    },
+    spotify: {
+      name: 'Spotify', color: '#1DB954', bg: 'rgba(29,185,84,0.15)', icon: '♫',
+      match: u => /open\.spotify\.com/.test(u),
+      embed: u => {
+        const m = u.match(/spotify\.com\/(track|album|playlist|artist|episode|show)\/([a-zA-Z0-9]+)/);
+        if (!m) return null;
+        const isMusic = ['track','album','playlist','artist'].includes(m[1]);
+        return {
+          src: `https://open.spotify.com/embed/${m[1]}/${m[2]}?utm_source=generator&theme=0`,
+          type: isMusic ? 'music' : 'music'
+        };
+      },
+      title: u => {
+        const m = u.match(/spotify\.com\/(track|album|playlist|artist|episode|show)\//);
+        const t = { track:'Canción', album:'Álbum', playlist:'Playlist', artist:'Artista', episode:'Episodio', show:'Podcast' };
+        return m ? `Spotify · ${t[m[1]] || 'Link'}` : 'Spotify';
+      }
+    },
+    soundcloud: {
+      name: 'SoundCloud', color: '#FF5500', bg: 'rgba(255,85,0,0.15)', icon: '◉',
+      match: u => /soundcloud\.com/.test(u),
+      embed: u => ({ src: `https://w.soundcloud.com/player/?url=${encodeURIComponent(u)}&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true`, type: 'music' }),
+      title: () => 'SoundCloud'
+    },
+    instagram: {
+      name: 'Instagram', color: '#C13584', bg: 'rgba(193,53,132,0.15)', icon: '◈',
+      match: u => /instagram\.com/.test(u),
+      embed: u => {
+        const m = u.match(/instagram\.com\/(?:p|reel|tv)\/([A-Za-z0-9_-]+)/);
+        return m ? { src: `https://www.instagram.com/p/${m[1]}/embed/captioned/`, type: 'post' } : null;
+      },
+      title: u => /\/reel\//.test(u) ? 'Instagram Reel' : /\/p\//.test(u) ? 'Publicación · Instagram' : 'Instagram'
+    },
+    tiktok: {
+      name: 'TikTok', color: '#EE1D52', bg: 'rgba(238,29,82,0.12)', icon: '♪',
+      match: u => /tiktok\.com/.test(u),
+      embed: null,
+      title: () => 'Video de TikTok'
+    },
+    twitter: {
+      name: 'Twitter / X', color: '#1DA1F2', bg: 'rgba(29,161,242,0.12)', icon: '𝕏',
+      match: u => /twitter\.com|x\.com/.test(u),
+      embed: null,
+      title: () => 'Tweet / X'
+    },
+    facebook: {
+      name: 'Facebook', color: '#1877F2', bg: 'rgba(24,119,242,0.12)', icon: 'f',
+      match: u => /facebook\.com|fb\.com/.test(u),
+      embed: null,
+      title: () => 'Facebook'
+    },
+    web: {
+      name: 'Sitio web', color: '#c9a85d', bg: 'rgba(201,168,93,0.12)', icon: '◎',
+      match: () => true,
+      embed: null,
+      title: u => { try { return new URL(u).hostname.replace('www.',''); } catch { return 'Link'; } }
+    }
+  };
+
+  function detect(url) {
+    for (const [k, p] of Object.entries(PLAT)) {
+      if (p.match(url)) return { key: k, ...p };
+    }
+    return { key: 'web', ...PLAT.web };
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function lbToast(msg) {
+    const t = document.getElementById('lbToast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  let lbLinks   = JSON.parse(localStorage.getItem('vanesita_lb3') || '[]');
+  let pendingUrl = '';
+
+  function lbSave() { localStorage.setItem('vanesita_lb3', JSON.stringify(lbLinks)); }
+
+  function lbAdd() {
+    const input = document.getElementById('lbInput');
+    let url = input.value.trim();
+    if (!url) return;
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    try { new URL(url); } catch { lbToast('URL no válida'); return; }
+    if (lbLinks.find(l => l.url === url)) { lbToast('Ese link ya está'); return; }
+
+    const p     = detect(url);
+    const embed = p.embed ? p.embed(url) : null;
+    const title = p.title ? p.title(url) : p.name;
+    const host  = (() => { try { return new URL(url).hostname.replace('www.',''); } catch { return url; } })();
+
+    lbLinks.unshift({ url, platform: p.key, title, host, embedSrc: embed?.src || null, embedType: embed?.type || null });
+    lbSave();
+    lbRender();
+    input.value = '';
+    lbToast(`✦ ${p.name} agregado`);
+  }
+
+  function lbRemove(i) {
+    lbLinks.splice(i, 1);
+    lbSave();
+    lbRender();
+  }
+
+  function lbRender() {
+    const list = document.getElementById('lbList');
+    if (lbLinks.length === 0) {
+      list.innerHTML = `<div class="lb-empty">✦ pega tu primer link arriba y aparecerá aquí ✦</div>`;
+      return;
+    }
+
+    list.innerHTML = lbLinks.map((l, i) => {
+      const p = { ...PLAT[l.platform] || PLAT.web };
+
+      let embedHtml = '';
+      if (l.embedSrc) {
+        const ratioClass = l.embedType === 'video' ? 'ratio-video' : l.embedType === 'post' ? 'ratio-post' : 'ratio-music';
+        embedHtml = `
+          <div class="lb-embed ${ratioClass}">
+            <iframe src="${esc(l.embedSrc)}"
+                    allowfullscreen
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; fullscreen"
+                    loading="lazy"></iframe>
+          </div>`;
+      }
+
+      return `
+        <div class="lb-card" style="--pcolor:${p.color}; --pbg:${p.bg};">
+          <div class="lb-card-body">
+            <div class="lb-icon" style="background:${p.bg}; color:${p.color}; font-family:serif;">${p.icon}</div>
+            <div class="lb-info">
+              <div class="lb-platform-name">${p.name}</div>
+              <div class="lb-title">${esc(l.title)}</div>
+              <div class="lb-url-display">${esc(l.host)}</div>
+            </div>
+            <div class="lb-actions">
+              <a href="${esc(l.url)}" target="_blank" rel="noopener" class="lb-open-btn">Abrir ↗</a>
+              <button class="lb-del-btn" onclick="lbRemove(${i})" title="Eliminar">✕</button>
+            </div>
+          </div>
+          ${embedHtml}
+        </div>`;
+    }).join('');
+  }
+
+  function openAddModal()        { document.getElementById('addModal').classList.add('open'); }
+  function closeAddModal(e)      { if (e.target.id === 'addModal') closeAddModalDirect(); }
+  function closeAddModalDirect() { document.getElementById('addModal').classList.remove('open'); }
+  function lbSaveCustom() {
+    const label = document.getElementById('lbLabelInput').value.trim();
+    if (pendingUrl && label) {
+      lbLinks[0].title = label;
+      lbSave();
+      lbRender();
+    }
+    closeAddModalDirect();
+  }
+
+  /* ── AGREGAR FOTO DINÁMICA ── */
+  const rotations = [-1.8, 1.1, -0.6, 2, -1.3, 0.8, -2.1, 1.5, -0.9, 1.7];
+  let extraCount = 0;
+
+  function addPhoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const src = e.target.result;
+      const rot = rotations[extraCount % rotations.length];
+      extraCount++;
+
+      const div = document.createElement('div');
+      div.className = 'frame';
+      div.style.transform = `rotate(${rot}deg)`;
+      div.innerHTML = `
+        <div class="frame-border">
+          <img src="${src}" alt="Recuerdo" class="frame-img">
+          <div class="frame-overlay"><p>Recuerdo ✦</p></div>
+        </div>
+      `;
+
+      // Insertar antes del cuadro +
+      const addFrame = document.querySelector('.add-frame');
+      addFrame.parentNode.insertBefore(div, addFrame);
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  }
+
+  lbRender();
+</script>
+</body>
+</html>
